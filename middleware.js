@@ -1,19 +1,23 @@
-// EdgeOne Makers 边缘中间件：API 路由定向与静态回退
-//
-// 1. 如果请求为 CookieCloud API (/update, /get/*, /health, /api/*)，放行到 Edge Functions / Cloud Functions 处理
-// 2. 静态页面（/assets/*, /icon.png, / 等）直接返回静态发布目录 dist 中的资源
-
+// EdgeOne 边缘中间件：请求路由与 SPA 回退
 export function middleware(context) {
-  const request = context.request;
-  const url = new URL(request.url);
-  const pathname = url.pathname;
+  const { request, next, rewrite } = context
+  const { pathname } = new URL(request.url)
+  const accept = request.headers.get("accept") || ""
 
-  const isApi =
-    pathname === '/health' ||
-    pathname === '/update' ||
-    pathname.startsWith('/get/') ||
-    pathname.startsWith('/api/');
+  // 后端 API 路由：直通 cloud-functions/[[default]].js 处理
+  const isBackend =
+    pathname === "/health" ||
+    pathname === "/update" ||
+    /^\/(get|api)(\/|$)/.test(pathname)
 
-  // 非 API 且请求 HTML 根路径或静态资源时，直接放行静态托管
-  return context.next();
+  // 浏览器访问页面（非 API 且要求 text/html）透明回退到 /index.html 静态页
+  if (
+    !isBackend &&
+    (request.method === "GET" || request.method === "HEAD") &&
+    accept.includes("text/html")
+  ) {
+    return rewrite("/index.html")
+  }
+
+  return next()
 }
