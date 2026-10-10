@@ -1,0 +1,29 @@
+{
+  "name": "cookiecloud-edgeone",
+  "version": "1.0.0",
+  "description": "CookieCloud server running on Tencent Cloud EdgeOne Pages (Edge Functions & Blob/KV)",
+  "type": "module",
+  "scripts": {
+    "build:web": "cd web && npm run build",
+    "build:edge": "node scripts/build.mjs",
+    "build": "npm run build:web && npm run build:edge",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [
+    "cookiecloud",
+    "edgeone",
+    "serverless",
+    "edge-functions",
+    "cookie-sync"
+  ],
+  "author": "lightsky9627",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@edgeone/pages-blob": "^0.0.14",
+    "crypto-js": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "esbuild": "^0.25.0"
+  }
+}
